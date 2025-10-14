@@ -1,5 +1,10 @@
 // roulette.js Roulette Game ferda
 
+// Gets random function made in random.js
+
+import { getRandomInt } from "../utils/random.js";
+
+
 class RouletteGame {
   constructor() {
     // Define roulette wheel numbers and colors
@@ -34,7 +39,7 @@ class RouletteGame {
 
   // Spin the wheel and generate result
   spin() {
-    const result = Math.floor(Math.random() * 37); // 0-36
+    const result = getRandomInt(0,37); // 0-36
     const color = this.getColor(result);
     
     return {
@@ -194,4 +199,4 @@ class RouletteGame {
 }
 
 // Export for use in Node.js backend
-module.exports = RouletteGame;
+export default RouletteGame;
