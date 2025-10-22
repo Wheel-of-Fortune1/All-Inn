@@ -1,25 +1,33 @@
 
+//Checks to see if backend is starting
+console.log("Starting backend...");
 // back-end/server.js
 import express from "express";
 import cors from "cors";
 
 // imports blackjack, roulette, slots from gameplay folder.
 
-import BlackjackGame from "./gameplay/blackjack.js";
+import BlackjackGame from "../gameplay/blackjack.js";
 
-import RouletteGame from "./gameplay/roulette.js";
+import RouletteGame from "../gameplay/roulette.js";
 
-import SlotsGame from "./gameplay/slots.js";
+import SlotsGame from "../gameplay/slots.js";
+
+
 
 // Creates the backend server and sets up the routes for the games.
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+
+
 // Creates One Instance Per Game Type
 const blackjack = new BlackjackGame();
 const roulette = new RouletteGame();
 const slots = new SlotsGame();
+
+
 
 // Black Jack Game Implementation
 
@@ -84,3 +92,15 @@ app.get("/api/slots/paytable", (req, res) => {
 app.get("/api/slots/probabilities", (req, res) => {
   res.json(slots.getSymbolProbabilities());
 });
+
+//Checks to see if backend is setup complete
+console.log("Backend setup complete.");
+
+//Checks to see if backend shows message at the website
+app.get("/", (req, res) => {
+  res.send("🎮 All-Inn Game Backend is running!");
+});
+
+// Starts the server at the port 3000.
+app.listen(3000, () => console.log("🎮 Backend running on http://localhost:3000"));
+
