@@ -5,6 +5,11 @@ console.log("Starting backend...");
 import express from "express";
 import cors from "cors";
 
+// For database access, database access methods.
+
+import bodyParser from "body-parser"
+import { pool, databaseTest, addPlayer, removePlayer, updatePlayer, getAllPlayers, getPlayer } from "../database/db.js"
+
 // imports blackjack, roulette, slots from gameplay folder.
 
 import BlackjackGame from "../gameplay/blackjack.js";
@@ -19,7 +24,7 @@ import SlotsGame from "../gameplay/slots.js";
 const app = express();
 app.use(cors());
 app.use(express.json());
-
+app.use(bodyParser.json());
 
 
 // Creates One Instance Per Game Type
@@ -91,6 +96,62 @@ app.get("/api/slots/paytable", (req, res) => {
 // Gives symbol probabilities info
 app.get("/api/slots/probabilities", (req, res) => {
   res.json(slots.getSymbolProbabilities());
+});
+
+app.get("/api/database/player/:username", async (req, res) => {
+    try {
+        const { username } = req.params
+        const player = await getPlayer(username)
+        if (!player) {
+            return res.status(404).json({ error: "Player not found." })
+        }
+
+        res.json(player)
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: "Failed to get player." })
+    }
+});
+
+app.post("/api/database/player", async (req, res) => {
+    try {
+        const { username, password, chips } = req.body
+        const player = await addPlayer(username, password, chips)
+        res.status(201).json(player)
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: "Failed to add player." })
+    }
+});
+
+app.delete("/api/database/player/:username", async (req, res) => {
+    try {
+        const { username } = req.params
+        await removePlayer(username)
+        res.json({message: `Player ${username} removed`})
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: "Failed to delete player." })
+    }
+});
+
+app.patch("/api/database/player/:username",  async (req, res) => {
+    try {
+        const { username } = req.params
+        const fields = req.body
+
+        const player = await updatePlayer(username, fields)
+        if (!player) {
+            return res.status(400).json({ error: "Failed to update player data." })
+        }
+        res.status(200).json(player);
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: "Failed to update player data."})
+    }
 });
 
 //Checks to see if backend is setup complete
