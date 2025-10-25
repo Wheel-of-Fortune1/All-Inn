@@ -1,5 +1,8 @@
 // slots.js Slot Machine Game Logic, this was partially based on the Bro Code video "Let's code a beginners Python SLOT MACHINE"
 
+// Gets random function made in random.js
+import { getRandomInt } from "../utils/random.js";
+
 class SlotsGame {
   constructor() {
     // Define slot symbols and their weights (for probability)
@@ -49,7 +52,7 @@ class SlotsGame {
 
   // Generate random symbol from weighted pool
   getRandomSymbol() {
-    const randomIndex = Math.floor(Math.random() * this.symbolPool.length);
+    const randomIndex = getRandomInt(0, this.symbolPool.length);
     return this.symbolPool[randomIndex];
   }
 
@@ -235,4 +238,4 @@ class SlotsGame {
 }
 
 // Export for use in Node.js backend
-module.exports = SlotsGame;
+export default SlotsGame;

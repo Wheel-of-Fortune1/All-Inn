@@ -1,4 +1,5 @@
 // blackjack.js: crazy blackjack 
+import { getRandomInt } from "../utils/random.js";
 
 class BlackjackGame {
   constructor() {
@@ -25,7 +26,7 @@ class BlackjackGame {
   // Fisher yates shuffle algorithm (this algorithm is from an 8 year old stack overflow post, worth a look)
   shuffleDeck() {
     for (let i = this.deck.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = getRandomInt(0, i + 1);
       [this.deck[i], this.deck[j]] = [this.deck[j], this.deck[i]];
     }
   }
@@ -185,4 +186,4 @@ class BlackjackGame {
 }
 
 // Export for use in Node.js backend
-module.exports = BlackjackGame;
+export default BlackjackGame;
