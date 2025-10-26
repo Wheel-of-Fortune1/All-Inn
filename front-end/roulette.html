@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Roulette</title>
+    <style>
+        body {
+            margin: 0;
+            background: radial-gradient(circle at center, #09203f, #000);
+            color: #fff;
+            font-family: "Poppins", sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .roulette-container {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            border: 10px solid #222;
+            overflow: hidden;
+            box-shadow: 0 0 30px #000;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 5px solid #000;
+            background: conic-gradient(
+                    red 0deg 9.73deg,
+                    black 9.73deg 19.46deg,
+                    red 19.46deg 29.19deg,
+                    black 29.19deg 38.92deg,
+                    red 38.92deg 48.65deg,
+                    black 48.65deg 58.38deg,
+                    red 58.38deg 68.11deg,
+                    black 68.11deg 77.84deg,
+                    red 77.84deg 87.57deg,
+                    black 87.57deg 97.3deg,
+                    red 97.3deg 107.03deg,
+                    black 107.03deg 116.76deg,
+                    red 116.76deg 126.49deg,
+                    black 126.49deg 136.22deg,
+                    red 136.22deg 145.95deg,
+                    black 145.95deg 155.68deg,
+                    red 155.68deg 165.41deg,
+                    black 165.41deg 175.14deg,
+                    red 175.14deg 184.87deg,
+                    black 184.87deg 194.6deg,
+                    red 194.6deg 204.33deg,
+                    black 204.33deg 214.06deg,
+                    red 214.06deg 223.79deg,
+                    black 223.79deg 233.52deg,
+                    red 233.52deg 243.25deg,
+                    black 243.25deg 252.98deg,
+                    red 252.98deg 262.71deg,
+                    black 262.71deg 272.44deg,
+                    red 272.44deg 282.17deg,
+                    black 282.17deg 291.9deg,
+                    red 291.9deg 301.63deg,
+                    black 301.63deg 311.36deg,
+                    red 311.36deg 321.09deg,
+                    black 321.09deg 330.82deg,
+                    red 330.82deg 340.55deg,
+                    black 340.55deg 350.28deg,
+                    green 350.28deg 360deg
+            );
+            transition: transform 4s cubic-bezier(0.2, 0.8, 0.3, 1);
+        }
+
+        .marker {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 20px solid yellow;
+        }
+
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        select, input {
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+            margin: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #2ecc71;
+        }
+
+        #result {
+            margin-top: 15px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<h1>🎡 Roulette</h1>
+<div class="roulette-container">
+    <div class="marker"></div>
+    <div id="wheel" class="wheel"></div>
+</div>
+
+<div class="controls">
+    <label for="betType">Bet Type:</label>
+    <select id="betType">
+        <option value="red">Red</option>
+        <option value="black">Black</option>
+        <option value="even">Even</option>
+        <option value="odd">Odd</option>
+        <option value="number">Specific Number</option>
+    </select>
+    <input type="number" id="betValue" placeholder="Number (0-36)" style="width:140px;">
+    <input type="number" id="betAmount" placeholder="Bet Amount" min="1" />
+    <br />
+    <button id="spin-btn">Spin Wheel</button>
+</div>
+
+<div id="result"></div>
+<script src="roulette.js"></script>
+</body>
+</html>
