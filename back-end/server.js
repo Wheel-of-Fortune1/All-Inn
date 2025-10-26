@@ -4,6 +4,9 @@ console.log("Starting backend...");
 // back-end/server.js
 import express from "express";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+
 
 // For database access, database access methods.
 
@@ -26,6 +29,10 @@ app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const frontendPath = path.join(__dirname, "../front-end");
+app.use(express.static(frontendPath));
 
 // Creates One Instance Per Game Type
 const blackjack = new BlackjackGame();
@@ -159,7 +166,8 @@ console.log("Backend setup complete.");
 
 //Checks to see if backend shows message at the website
 app.get("/", (req, res) => {
-  res.send("🎮 All-Inn Game Backend is running!");
+    res.sendFile(path.join(frontendPath, "index.html"));
+    res.send("🎮 All-Inn Game Backend is running!");
 });
 
 // Starts the server at the port 3000.
