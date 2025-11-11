@@ -45,6 +45,8 @@ const slots = new SlotsGame();
 
 // Starts a new game, player can hit or stand after this.
 app.post("/api/blackjack/start", (req, res) => {
+  console.log("Frontend requested: Start Game");
+  console.log("✅ /api/blackjack/start route was called!");
   const { bet } = req.body;
   const result = blackjack.startGame(bet);
   res.json(result);
@@ -72,13 +74,21 @@ app.get("/api/blackjack/state", (req, res) => {
 
 // Reads bets and spins once done.
 app.post("/api/roulette/play", (req, res) => {
+  console.log("Frontend requested: Start Game");
   const { bets } = req.body;
   const result = roulette.placeBet(bets);
-  res.json(result);
+  console.log("Got result:", result);
+  res.json({
+    winningNumber: result.spinResult.number,
+    color: result.spinResult.color,
+    message: result.message,
+    details: result, // optional full detail
+  });
 });
 
 // Gives list of valid bet types.
 app.get("/api/roulette/bet-types", (req, res) => {
+  console.log("Frontend requested: Get Bet Types");
   res.json(roulette.getBetTypes());
 });
 
@@ -87,6 +97,7 @@ app.get("/api/roulette/bet-types", (req, res) => {
 //Reads bet amount and spins once done.
 app.post("/api/slots/play", (req, res) => {
   const { bet } = req.body;
+  console.log("Frontend requested: Start Game");
   if (!bet || bet <= 0) {
     return res.status(400).json({ error: "Invalid bet amount" });
   }
