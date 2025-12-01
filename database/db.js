@@ -25,34 +25,38 @@ export async function databaseTest() {
     client.release()
 }
 
-// Database alteration functions.
+// IE, getTop(players, chips), or getTop(roulette, wins)
 
-export async function getAllPlayers() {
+export async function getTop(leaderboard, by) {
     const result = await pool.query(
-        "SELECT * FROM players"
+        `SELECT * FROM ${leaderboard} ORDER BY ${by} DESC LIMIT 100`
     )
     return result.rows
 }
 
-export async function getPlayer(username) {
+export async function getAll(datatype) {
     const result = await pool.query(
-        "SELECT * FROM players WHERE username = $1", [username] 
+        `SELECT * FROM ${datatype}`
     )
-
-    // console.log(result.rows[0])
-
-    return result.rows[0]
-
-
-    // Info can then be accessed. I.e, player = getPlayer("Thomas"), chips = player.chips
-    // Can return undefined if there is no player.
-
+    return result.rows
 }
 
+export async function Get(dataType, username) {
+    const result = await pool.query(
+        `SELECT * FROM ${dataType} WHERE username = $1`, [username]
+    )
+    return result.rows[0]
+}
+
+// Database alteration functions.
+
 export async function addPlayer(username, password, chips = 1000) {
-    const result = await pool.query (
+    username = String(username)
+    password = String(password)
+    const result = await pool.query(
         "INSERT INTO players (username, password, chips) VALUES ($1, $2, $3) RETURNING *", [username, password, chips]
     )
+
     return result.rows[0]
 }
 
@@ -63,7 +67,30 @@ export async function removePlayer(username) {
     return 0
 }
 
-export async function updatePlayer(username, fields) {
+export async function Increment(dataType, username, fields) {
+    const entries = Object.entries(fields);
+
+    // Confirm that we have sent any data to be changed.
+
+    if (entries.length === 0) return null;
+
+    // Create a string using all of the keys we are setting.
+
+    const setString = entries.map(([key], i) => `${key} = ${key} + $${i + 1}`).join(", ");
+
+    // List all values with username at the end so it can be subbed into the query request.
+
+    const values = [...entries.map(([, val]) => val), username];
+
+    const result = await pool.query(
+        `UPDATE ${dataType} SET ${setString} WHERE username = $${entries.length + 1} RETURNING *`,
+        values
+    );
+
+    return result.rows[0];
+}
+
+export async function Update(dataType, username, fields) {
     const entries = Object.entries(fields);
 
     // Confirm that we have sent any data to be changed.
@@ -79,7 +106,7 @@ export async function updatePlayer(username, fields) {
     const values = [...entries.map(([, val]) => val), username];
 
     const result = await pool.query(
-        `UPDATE players SET ${setString} WHERE username = $${entries.length + 1} RETURNING *`,
+        `UPDATE ${dataType} SET ${setString} WHERE username = $${entries.length + 1} RETURNING *`,
         values
     );
 

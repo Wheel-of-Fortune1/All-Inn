@@ -11,7 +11,7 @@ import { fileURLToPath } from "url";
 // For database access, database access methods.
 
 import bodyParser from "body-parser"
-import { pool, databaseTest, addPlayer, removePlayer, updatePlayer, getAllPlayers, getPlayer } from "../database/db.js"
+import { pool, databaseTest, addPlayer, removePlayer, Update, getAll, Get, getTop, Increment } from "../database/db.js"
 
 // imports blackjack, roulette, slots from gameplay folder.
 
@@ -21,10 +21,10 @@ import RouletteGame from "../gameplay/roulette.js";
 
 import SlotsGame from "../gameplay/slots.js";
 
-
-
 // Creates the backend server and sets up the routes for the games.
 const app = express();
+import helmet from "helmet"
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
@@ -116,10 +116,48 @@ app.get("/api/slots/probabilities", (req, res) => {
   res.json(slots.getSymbolProbabilities());
 });
 
-app.get("/api/database/player/:username", async (req, res) => {
+// Login
+
+app.post("/api/auth/:mode", async (req, res) => {
+    const { mode } = req.params
+    const { username, password } = req.body
+
+    if (!username || !password) {
+        return res.status(400).json({ error: "Username and password required." });
+    }
+
+    if (mode == "signin") {
+        const player = await Get("players", username)
+        if (!player) {
+            return res.status(404).json({ error: "Account does not exist." })
+        }
+        if (password != player.password) {
+            return res.status(401).json({ error: "Password is incorrect." });
+        }
+        return res.json(player)
+    } else if (mode == "signup") {
+        const exists = await Get("players", username)
+        if (exists) {
+            return res.status(409).json({ error: "Account already exists." })
+        }
+        try {
+            const player = await addPlayer(username, password, 0);
+            return res.status(201).json(player)
+
+        } catch(error) {
+            return res.status(500).json({ error: "Server error during signup." });
+        }
+    } else {
+        return res.status(400).json({ error: "Invalid auth request." });
+    }
+});
+
+// Database API
+
+app.get("/api/database/data/:table/:username", async (req, res) => {
     try {
-        const { username } = req.params
-        const player = await getPlayer(username)
+        const { table, username } = req.params
+        const player = await Get(table, username)
         if (!player) {
             return res.status(404).json({ error: "Player not found." })
         }
@@ -128,6 +166,35 @@ app.get("/api/database/player/:username", async (req, res) => {
     } catch (error) {
         console.error(error)
         res.status(500).json({ error: "Failed to get player." })
+    }
+});
+
+app.get("/api/database/leaderboard/:leaderName", async (req, res) => {
+    try {
+        const { leaderboard } = req.params
+        const { by } = req.body
+        const top = await getTop(leaderboard, by)
+        res.status(201).json(top)
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: "Failed to get database." })
+    }
+});
+
+app.patch("/api/database/data/:table/:username/add", async (req, res) => {
+    try {
+        const { table, username } = req.params
+        const fields = req.body
+
+        const player = await Increment(table, username, fields)
+        if (!player) {
+            return res.status(400).json({ error: "Failed to update player data." })
+        }
+        res.status(200).json(player);
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: "Failed to update player data." })
     }
 });
 
@@ -147,7 +214,7 @@ app.delete("/api/database/player/:username", async (req, res) => {
     try {
         const { username } = req.params
         await removePlayer(username)
-        res.json({message: `Player ${username} removed`})
+        res.json({ message: `Player ${username} removed` })
 
     } catch (error) {
         console.error(error)
@@ -155,12 +222,12 @@ app.delete("/api/database/player/:username", async (req, res) => {
     }
 });
 
-app.patch("/api/database/player/:username",  async (req, res) => {
+app.patch("/api/database/data/:table/:username", async (req, res) => {
     try {
-        const { username } = req.params
+        const { table, username } = req.params
         const fields = req.body
 
-        const player = await updatePlayer(username, fields)
+        const player = await Update(table, username, fields)
         if (!player) {
             return res.status(400).json({ error: "Failed to update player data." })
         }
@@ -168,7 +235,7 @@ app.patch("/api/database/player/:username",  async (req, res) => {
 
     } catch (error) {
         console.error(error)
-        res.status(500).json({ error: "Failed to update player data."})
+        res.status(500).json({ error: "Failed to update player data." })
     }
 });
 
@@ -178,7 +245,6 @@ console.log("Backend setup complete.");
 //Checks to see if backend shows message at the website
 app.get("/", (req, res) => {
     res.sendFile(path.join(frontendPath, "index.html"));
-    res.send("🎮 All-Inn Game Backend is running!");
 });
 
 // Starts the server at the port 3000.
