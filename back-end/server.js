@@ -184,7 +184,7 @@ app.post("/api/auth/:mode", async (req, res) => {
       return res.status(409).json({ error: "Account already exists." });
     }
 
-    const newPlayer = await addPlayer(username, password, 0);
+    const newPlayer = await addPlayer(username, password, 1000);
 
     // Save in session
     req.session.user = {

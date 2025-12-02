@@ -150,6 +150,31 @@
             border-radius: 6px;
             font-size: 11px;
         }
+        #home-btn {
+            appearance: none;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            background: linear-gradient(180deg, #3b82f6, #1d4ed8); /* blue gradient */
+            color: white;
+            font-weight: 700;
+            letter-spacing: .4px;
+            padding: 16px 28px;
+            border-radius: 20px;
+            box-shadow: 0 12px 24px rgba(59,130,246,.35);
+            transition: transform .06s ease, filter .2s ease;
+            margin: 20px auto 0; /* center it below the card */
+            display: block;
+}
+
+#home-btn:hover {
+  filter: brightness(1.1);
+}
+
+#home-btn:active {
+  transform: translateY(1px) scale(.98);
+}
+
     </style>
 </head>
 <body>
@@ -159,7 +184,6 @@
             <div class="title">🎰 Mini Casino — Slots</div>
             <div class="subtitle">3×3 Reels • 5 Paylines • Animated Spins</div>
         </div>
-        <button id="resetBtn" class="btn btn-secondary">Reset $100</button>
     </div>
 
     <section class="controls">

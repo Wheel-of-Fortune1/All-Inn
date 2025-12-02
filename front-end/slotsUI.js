@@ -1,6 +1,6 @@
 const homeBtn = document.getElementById("home-btn");
 const spinBtn = document.getElementById("spinBtn");
-const resetBtn = document.getElementById("resetBtn");
+
 const betSelect = document.getElementById("bet");
 const linesSelect = document.getElementById("lines");
 const balanceDisplay = document.getElementById("balance");
@@ -57,15 +57,10 @@ function stopReels(finalIcons) {
 
 homeBtn.addEventListener("click", () => {
     // Go back to homepage (adjust path if needed)
-    window.location.href = "index.html"; 
+    window.location.href = "home.html"; 
 });
 
-// === RESET BUTTON ===
-resetBtn.addEventListener("click", () => {
-    balance = 100;
-    lastResultDisplay.textContent = "Balance reset!";
-    updateUI();
-});
+
 
 
 // === MAIN SPIN BUTTON ===

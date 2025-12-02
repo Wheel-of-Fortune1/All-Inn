@@ -1,112 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Admin Panel</title>
-    <style>
-        body {
-            background: #0f172a;
-            color: white;
-            font-family: Arial, sans-serif;
-            padding: 40px;
-        }
-        h1 { margin-bottom: 20px; }
-        input {
-            padding: 10px;
-            border-radius: 6px;
-            border: none;
-            margin-right: 10px;
-            width: 200px;
-        }
-        button {
-            padding: 10px 20px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-        #msg { margin-top: 20px; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <style>
+    body {
+      background: #0f172a;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 40px;
+    }
+    h1 { margin-bottom: 20px; }
+    input {
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      margin-right: 10px;
+      width: 200px;
+    }
+    button {
+      padding: 10px 20px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    #msg { margin-top: 20px; }
+
+    /* Flex layout for buttons */
+    .button-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #homeBtn {
+      margin-left: auto; /* pushes Home button to the right */
+      background: linear-gradient(135deg, #1fddff, #ff4b1f);
+      color: white;
+      font-weight: bold;
+    }
+    #homeBtn:hover {
+      opacity: 0.85;
+    }
+  </style>
 </head>
 <body>
 
-<h1>🛠 Admin Panel</h1>
+  <h1>🛠 Admin Panel</h1>
 
-<!-- Admin panel container -->
-<div id="adminPanel" style="display: none;">
-    <input id="username" placeholder="Username">
-    <button id="banBtn">Ban</button>
-    <button id="unbanBtn">Unban</button>
+  <!-- Admin panel container -->
+  <div id="adminPanel" style="display: none;">
+    <div class="button-row">
+      <input id="username" placeholder="Username">
+      <button id="banBtn">Ban</button>
+      <button id="unbanBtn">Unban</button>
+      <button id="homeBtn"> Home</button> 
+    </div>
     <p id="msg"></p>
-</div>
+  </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", async () => {
-    try {
-        // Get logged-in user info
-        const res = await fetch("/api/auth/me", { credentials: "include" });
-        const user = await res.json();
-        console.log("User from /api/auth/me:", user);
-
-
-        const adminPanel = document.getElementById("adminPanel");
-
-        // Redirect non-admins to home
-        if (!user || user.role !== "admin") {
-            window.location.href = "home.html";
-            return;
-        }
-
-        // Show admin panel for admins
-        adminPanel.style.display = "block";
-
-        // Ban/unban button logic
-        document.getElementById("banBtn").onclick = async () => {
-            const username = document.getElementById("username").value.trim();
-            if (!username) return alert("Enter a username");
-
-            try {
-                const res = await fetch("/api/admin/ban", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",   // <-- add this
-                    body: JSON.stringify({ username })
-                });
-
-                const data = await res.json();
-                document.getElementById("msg").textContent = data.message || data.error;
-            } catch (err) {
-                console.error(err);
-                document.getElementById("msg").textContent = "Error banning user";
-            }
-        };
-
-        document.getElementById("unbanBtn").onclick = async () => {
-            const username = document.getElementById("username").value.trim();
-            if (!username) return alert("Enter a username");
-
-            try {
-                const res = await fetch("/api/admin/unban", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    credentials: "include",
-                    body: JSON.stringify({ username })
-                });
-
-                const data = await res.json();
-                document.getElementById("msg").textContent = data.message || data.error;
-            } catch (err) {
-                console.error(err);
-                document.getElementById("msg").textContent = "Error unbanning user";
-            }
-        };
-
-    } catch (err) {
-        console.error("Admin check failed:", err);
-        window.location.href = "home.html";
-    }
-});
-</script>
-
+  <!-- External script -->
+  <script src="admin.js"></script>
 </body>
 </html>

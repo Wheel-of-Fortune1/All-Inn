@@ -67,5 +67,5 @@ spinBtn.addEventListener("click", async () => {
 
 homeBtn.addEventListener("click", () => {
     // Go back to homepage (adjust path if needed)
-    window.location.href = "index.html"; 
+    window.location.href = "home.html"; 
 });
