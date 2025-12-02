@@ -25,15 +25,17 @@ import SlotsGame from "../gameplay/slots.js";
 const app = express();
 import helmet from "helmet"
 app.use(helmet());
-app.use(cors({
-  origin: "http://localhost:3000", 
-  credentials: true
-}));
+
 
 app.use(express.json());
 app.use(bodyParser.json());
 
 import session from "express-session";
+
+app.use(cors({
+  origin: "http://localhost:3000", 
+  credentials: true
+}));
 
 app.use(session({
   secret: "super-secret-key-change-this",
@@ -42,7 +44,7 @@ app.use(session({
   cookie: {
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 24,
-    sameSite: "none",   // <-- change this
+    sameSite: "lax",   // <-- change this
     secure: false       // true if using HTTPS
 
   }
@@ -163,9 +165,13 @@ app.post("/api/auth/:mode", async (req, res) => {
     // Save session
     req.session.user = {
       username: player.username,
-      role: player.role || "user", // default normal user
+      role: player.role, // default normal user
       banned: player.banned
     };
+
+    console.log("Session after login:", req.session.user);
+    console.log("Cookie being set:", req.sessionID);
+
 
     return res.json(req.session.user);
   }
@@ -196,10 +202,15 @@ app.post("/api/auth/:mode", async (req, res) => {
 
 // Get current logged in user info
 app.get("/api/auth/me", (req, res) => {
+  console.log("Session ID:", req.sessionID);
+  console.log("Session object:", req.session);
+
   if (!req.session.user) {
-    // Not logged in at all
+    console.log("No session user found.");
     return res.json({ role: "guest" });
   }
+  console.log("Returning session user:", req.session.user);
+
 
   // Logged in user (could be "user" or "admin")
   res.json(req.session.user);
