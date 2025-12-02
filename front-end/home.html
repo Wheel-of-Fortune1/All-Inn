@@ -30,34 +30,15 @@
     </style>
 </head>
 <body>
-<h1>🎲 What would you like to play?</h1>
-<a href="blackjack.html">🃏 Play Blackjack</a>
-<a href="roulette.html">🎡 Play Roulette</a>
-<a href="slots.html">🎰 Play Slots</a>
-<a href="leaderboard.html">🏆 View Leaderboard</a>
+  <h1>🎲 What would you like to play?</h1>
+  <a href="blackjack.html">🃏 Play Blackjack</a>
+  <a href="roulette.html">🎡 Play Roulette</a>
+  <a href="slots.html">🎰 Play Slots</a>
+  <a href="leaderboard.html">🏆 View Leaderboard</a>
 
-<a href="admin.html" id="adminBtn" style="display:none;">🛠 Admin Panel</a>
+  <a href="admin.html" id="adminBtn" style="display:none;">🛠 Admin Panel</a>
 
-  <script>
-    async function checkRole() {
-      try {
-        console.log("Calling /api/auth/me...");
-        const res = await fetch("/api/auth/me", { credentials: "include" });
-        const user = await res.json();
-        console.log("User role check:", user);
-
-        if (user.role === "admin") {
-          document.getElementById("adminBtn").style.display = "inline-block";
-        }
-      } catch (err) {
-        console.error("Role check failed", err);
-      }
-      
-    }
-    console.log("Role check complete");
-    checkRole();
-    
-</script>
+  <script src="home.js"></script>
 
 </body>
 </html>
