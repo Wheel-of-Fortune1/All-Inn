@@ -25,9 +25,29 @@ import SlotsGame from "../gameplay/slots.js";
 const app = express();
 import helmet from "helmet"
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3000", 
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(bodyParser.json());
+
+import session from "express-session";
+
+app.use(session({
+  secret: "super-secret-key-change-this",
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 24,
+    sameSite: "none",   // <-- change this
+    secure: false       // true if using HTTPS
+
+  }
+}));
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -116,41 +136,112 @@ app.get("/api/slots/probabilities", (req, res) => {
   res.json(slots.getSymbolProbabilities());
 });
 
-// Login
-
+// LOGIN + SIGNUP
 app.post("/api/auth/:mode", async (req, res) => {
-    const { mode } = req.params
-    const { username, password } = req.body
+  const { mode } = req.params;
+  const { username, password } = req.body;
 
-    if (!username || !password) {
-        return res.status(400).json({ error: "Username and password required." });
+  if (!username || !password) {
+    return res.status(400).json({ error: "Username and password required." });
+  }
+
+  if (mode === "signin") {
+    const player = await Get("players", username);
+    if (!player) {
+      return res.status(404).json({ error: "Account does not exist." });
     }
 
-    if (mode == "signin") {
-        const player = await Get("players", username)
-        if (!player) {
-            return res.status(404).json({ error: "Account does not exist." })
-        }
-        if (password != player.password) {
-            return res.status(401).json({ error: "Password is incorrect." });
-        }
-        return res.json(player)
-    } else if (mode == "signup") {
-        const exists = await Get("players", username)
-        if (exists) {
-            return res.status(409).json({ error: "Account already exists." })
-        }
-        try {
-            const player = await addPlayer(username, password, 0);
-            return res.status(201).json(player)
-
-        } catch(error) {
-            return res.status(500).json({ error: "Server error during signup." });
-        }
-    } else {
-        return res.status(400).json({ error: "Invalid auth request." });
+    // ❗ BANNED CHECK HERE
+    if (player.banned) {
+      return res.status(403).json({ error: "Your account has been banned." });
     }
+
+    if (password !== player.password) {
+      return res.status(401).json({ error: "Incorrect password." });
+    }
+
+    // Save session
+    req.session.user = {
+      username: player.username,
+      role: player.role || "user", // default normal user
+      banned: player.banned
+    };
+
+    return res.json(req.session.user);
+  }
+
+  if (mode === "signup") {
+
+    const exists = await Get("players", username);
+
+    if (exists) {
+      return res.status(409).json({ error: "Account already exists." });
+    }
+
+    const newPlayer = await addPlayer(username, password, 0);
+
+    // Save in session
+    req.session.user = {
+      username: newPlayer.username,
+      role: newPlayer.role || "user",
+      banned: false
+    };
+
+    return res.status(201).json(req.session.user);
+  }
+
+  return res.status(400).json({ error: "Invalid auth request." });
 });
+
+
+// Get current logged in user info
+app.get("/api/auth/me", (req, res) => {
+  if (!req.session.user) {
+    // Not logged in at all
+    return res.json({ role: "guest" });
+  }
+
+  // Logged in user (could be "user" or "admin")
+  res.json(req.session.user);
+});
+
+
+// ADMIN: Ban a User
+app.post("/api/admin/ban", async (req, res) => {
+  if (!req.session.user || req.session.user.role !== "admin") {
+    return res.status(403).json({ error: "Forbidden" });
+  }
+
+  const { username } = req.body;
+  if (!username) return res.status(400).json({ error: "Username required." });
+
+  const found = await Get("players", username);
+  if (!found) return res.status(404).json({ error: "User not found." });
+
+  await Update("players", username, { banned: true });
+
+  res.json({ message: `User ${username} was banned.` });
+});
+
+// ADMIN: Unban a User
+app.post("/api/admin/unban", async (req, res) => {
+  if (!req.session.user || req.session.user.role !== "admin") {
+    return res.status(403).json({ error: "Forbidden" });
+  }
+
+  const { username } = req.body;
+  if (!username) return res.status(400).json({ error: "Username required." });
+
+  const found = await Get("players", username);
+  if (!found) return res.status(404).json({ error: "User not found." });
+
+  const updated = await Update("players", username, { banned: false });
+  if (!updated) return res.status(500).json({ error: "Failed to unban user." });
+
+  res.json({ message: `User ${username} was unbanned.` });
+});
+
+
 
 // Database API
 

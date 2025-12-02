@@ -35,5 +35,30 @@
 <a href="roulette.html">🎡 Play Roulette</a>
 <a href="slots.html">🎰 Play Slots</a>
 <a href="leaderboard.html">🏆 View Leaderboard</a>
+
+<a href="admin.html" id="adminBtn" style="display:none;">🛠 Admin Panel</a>
+
+  <script>
+    async function checkRole() {
+      try {
+        console.log("Calling /api/auth/me...");
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        const user = await res.json();
+        console.log("User role check:", user);
+
+        if (user.role === "admin") {
+          document.getElementById("adminBtn").style.display = "inline-block";
+        }
+      } catch (err) {
+        console.error("Role check failed", err);
+      }
+      
+    }
+    console.log("Role check complete");
+    checkRole();
+    
+</script>
+
 </body>
 </html>
+
