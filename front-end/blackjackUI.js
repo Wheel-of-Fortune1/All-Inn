@@ -70,7 +70,7 @@ hitBtn.addEventListener("click", async () => {
   if (data.bust) {
     message.textContent = data.message;
     hitBtn.disabled = true;
-    standBtn.disabled = true;
+    standBtn.disabled = true;   
   }
 });
 
@@ -87,5 +87,5 @@ standBtn.addEventListener("click", async () => {
 // Home button event listener
 homeBtn.addEventListener("click", () => {
   // Go back to homepage (adjust path if needed)
-  window.location.href = "index.html"; 
+  window.location.href = "home.html"; 
 });
