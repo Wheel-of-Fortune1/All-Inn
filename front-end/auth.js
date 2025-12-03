@@ -1,4 +1,4 @@
-
+// Wait for DOM to load
 document.addEventListener('DOMContentLoaded', function () {
     const signInBtn = document.getElementById("signInBtn");
     const signUpBtn = document.getElementById("signUpBtn");
@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const errorMsg = document.getElementById("errorMsg");
 
     let mode = null;
-
+    // Sign In button listener
     signInBtn.addEventListener("click", function (e) {
         e.preventDefault();
        
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
         errorMsg.textContent = "";
         authForm.username.focus();
     });
-
+    // Sign Up button listener
     signUpBtn.addEventListener("click", function (e) {
         e.preventDefault();
 
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
         errorMsg.textContent = "";
         authForm.username.focus();
     });
-
+    // Form submission listener
     authForm.addEventListener("submit", async function (e) {
         e.preventDefault();
 

@@ -77,7 +77,7 @@ startBtn.addEventListener("click", async () => {
     }
 });
 
-
+// Hit button event listener
 hitBtn.addEventListener("click", async () => {
     const res = await fetch("/api/blackjack/hit", { method: "POST" });
     const data = await res.json();
@@ -99,7 +99,7 @@ hitBtn.addEventListener("click", async () => {
         });
     }
 });
-
+// Stand button event listener
 standBtn.addEventListener("click", async () => {
     const res = await fetch("/api/blackjack/stand", { method: "POST" });
     const data = await res.json();
@@ -124,12 +124,13 @@ homeBtn.addEventListener("click", () => {
     window.location.href = "home.html";
 });
 
+// Functions to hide and show menu buttons
 function hideMenuButtons() {
   startBtn.style.display = "none";
   homeBtn.style.display = "none";
 }
 
-
+// Show menu buttons
 function showMenuButtons() {
   startBtn.style.display = "inline-block"; // or "block" depending on layout
   homeBtn.style.display = "inline-block";

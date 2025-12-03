@@ -1,3 +1,4 @@
+// Wait for DOM to load
 document.addEventListener("DOMContentLoaded", () => {
   console.log("✅ home.js loaded and DOM ready");
 
@@ -10,10 +11,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const user = await res.json();
       console.log("User role check:", user);
 
+      // Show admin button if user is admin
       if (user.role === "admin") {
         console.log("✅ Admin detected, showing button");
         document.getElementById("adminBtn").style.display = "inline-block";
       } else {
+        // Hide admin button for non-admins
         console.log("❌ Not admin, hiding button");
         document.getElementById("adminBtn").style.display = "none";
       }
@@ -21,6 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Role check failed", err);
     }
   }
-
+  // Initial role check on page load
   checkRole();
 });
