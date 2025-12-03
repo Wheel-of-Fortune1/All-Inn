@@ -135,7 +135,8 @@ class RouletteGame {
     });
 
     // Calculate net result (winnings - total bet)
-    const netResult = totalWinnings - totalBet;
+      const netResult = totalWinnings - totalBet;
+
 
     return {
       spinResult: {

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🎮 All-Inn Casino - Leaderboard</title>
+    <link rel="stylesheet" href="navbar.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #0f2027, #203a43, #2c5364);
+            color: white;
+            font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 80px 20px 20px;
+        }
+
+        h1 {
+            font-size: 42px;
+            margin-bottom: 40px;
+            text-shadow: 3px 3px 10px black;
+            text-align: center;
+            color: white;
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+            .tab-btn:hover {
+                background: rgba(255, 255, 255, 0.2);
+                transform: translateY(-2px);
+            }
+
+            .tab-btn.active {
+                background: linear-gradient(135deg, #ff4b1f, #1fddff);
+                border-color: white;
+                transform: scale(1.05);
+            }
+
+        .sort-container {
+            display: flex;
+            gap: 10px;
+            margin: 0 0 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .sort-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .sort-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+            .sort-btn:hover {
+                background: rgba(255, 255, 255, 0.15);
+                border-color: rgba(255, 255, 255, 0.5);
+            }
+
+            .sort-btn.active {
+                background: linear-gradient(135deg, #ff4b1f, #1fddff);
+                border-color: white;
+                font-weight: 700;
+            }
+
+        .leaderboard-container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .leaderboard-header {
+            display: grid;
+            grid-template-columns: 80px 1fr 150px;
+            gap: 20px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #ff4b1f, #1fddff);
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .leaderboard-list {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+            .leaderboard-list::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            .leaderboard-list::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 10px;
+            }
+
+            .leaderboard-list::-webkit-scrollbar-thumb {
+                background: linear-gradient(135deg, #ff4b1f, #1fddff);
+                border-radius: 10px;
+            }
+
+        .leaderboard-item {
+            display: grid;
+            grid-template-columns: 80px 1fr 150px;
+            gap: 20px;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+            align-items: center;
+        }
+
+            .leaderboard-item:hover {
+                background: rgba(255, 255, 255, 0.1);
+                transform: translateX(5px);
+            }
+
+            .leaderboard-item.top-1 {
+                background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.1));
+                border: 2px solid gold;
+            }
+
+            .leaderboard-item.top-2 {
+                background: linear-gradient(135deg, rgba(192, 192, 192, 0.3), rgba(192, 192, 192, 0.1));
+                border: 2px solid silver;
+            }
+
+            .leaderboard-item.top-3 {
+                background: linear-gradient(135deg, rgba(205, 127, 50, 0.3), rgba(205, 127, 50, 0.1));
+                border: 2px solid #cd7f32;
+            }
+
+        .rank {
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .username {
+            font-size: 18px;
+            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .score {
+            font-size: 18px;
+            font-weight: 700;
+            text-align: right;
+            color: #1fddff;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: #ff6b6b;
+        }
+
+        .medal {
+            font-size: 24px;
+            margin-right: 5px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 30px;
+            transition: transform 0.2s;
+            font-size: 16px;
+        }
+
+            .back-btn:hover {
+                transform: scale(1.05);
+            }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 32px;
+            }
+
+            .tab-btn {
+                padding: 12px 20px;
+                font-size: 16px;
+            }
+
+            .sort-btn {
+                padding: 8px 15px;
+                font-size: 13px;
+            }
+
+            .leaderboard-container {
+                padding: 20px;
+            }
+
+            .leaderboard-header,
+            .leaderboard-item {
+                grid-template-columns: 60px 1fr 120px;
+                gap: 10px;
+                padding: 12px 15px;
+            }
+
+            .rank {
+                font-size: 16px;
+            }
+
+            .username {
+                font-size: 16px;
+            }
+
+            .score {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🏆 Leaderboard</h1>
+
+    <div class="tab-container">
+        <button class="tab-btn active" data-category="chips">💰 Chips</button>
+        <button class="tab-btn" data-category="blackjack">🃏 Blackjack</button>
+        <button class="tab-btn" data-category="roulette">🎯 Roulette</button>
+        <button class="tab-btn" data-category="slots">🎰 Slots</button>
+    </div>
+
+    <div class="sort-container">
+        <span class="sort-label">Sort by:</span>
+        <button class="sort-btn active" data-sort="balance">Balance</button>
+    </div>
+
+    <div class="leaderboard-container">
+        <div class="leaderboard-header">
+            <div>Rank</div>
+            <div>Player</div>
+            <div id="scoreLabel">Balance</div>
+        </div>
+        <div class="leaderboard-list" id="leaderboardList">
+            <div class="loading">Loading leaderboard...</div>
+        </div>
+    </div>
+
+    <a href="home.html" class="back-btn">🏠 Back to Casino</a>
+
+    <script src="navbar.js"></script>
+    <script src="leaderboard.js"></script>
+
+</body>
+</html>

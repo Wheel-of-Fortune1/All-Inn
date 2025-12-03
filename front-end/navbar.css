@@ -1,0 +1,130 @@
+.casino-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(135deg, rgba(15, 32, 39, 0.95), rgba(44, 83, 100, 0.95));
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+h1 {
+    font-size: 42px;
+    margin-bottom: 40px;
+    text-shadow: 3px 3px 10px black;
+    text-align: center;
+    color: white;
+}
+
+.navbar-logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s;
+}
+
+    .navbar-logo:hover {
+        transform: scale(1.05);
+    }
+
+.navbar-center {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.navbar-right {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.chip-display {
+    background: linear-gradient(135deg, #ff4b1f, #1fddff);
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 18px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(255, 75, 31, 0.3);
+    animation: chipPulse 2s ease-in-out infinite;
+}
+
+@keyframes chipPulse {
+    0%, 100% {
+        box-shadow: 0 4px 15px rgba(255, 75, 31, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 4px 25px rgba(31, 221, 255, 0.5);
+    }
+}
+
+.navbar-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 8px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+    .navbar-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+    }
+
+.navbar-username {
+    color: #93c5fd;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Adjust body padding so content doesn't hide under navbar */
+body {
+    padding-top: 60px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .casino-navbar {
+        height: auto;
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .navbar-center {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .chip-display {
+        font-size: 16px;
+        padding: 6px 15px;
+    }
+
+    body {
+        padding-top: 120px;
+    }
+}
