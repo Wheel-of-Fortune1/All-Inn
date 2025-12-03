@@ -3,11 +3,11 @@ const spinBtn = document.getElementById("spinBtn");
 
 const betSelect = document.getElementById("bet");
 const linesSelect = document.getElementById("lines");
-const balanceDisplay = document.getElementById("balance");
+
 const lastResultDisplay = document.getElementById("lastResult");
 
 // === GAME STATE ===
-let balance = 100;
+
 let spinning = false;
 
 // Reel elements
@@ -89,7 +89,7 @@ spinBtn.addEventListener("click", async () => {
         const icons = result.reels.map(r => r.icon);
         stopReels(icons);
 
-        balanceDisplay.textContent = `$${parseInt(balanceDisplay.textContent.slice(1)) + result.netResult}`;
+
         lastResultDisplay.textContent = result.message;
 
         spinBtn.disabled = false;

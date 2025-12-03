@@ -69,6 +69,8 @@ startBtn.addEventListener("click", async () => {
         hitBtn.disabled = false;
         standBtn.disabled = false;
 
+        hideMenuButtons();
+
     } catch (error) {
         console.error("Error connecting to backend:", error);
         message.textContent = "❌ Backend connection failed.";
@@ -85,6 +87,7 @@ hitBtn.addEventListener("click", async () => {
         message.textContent = data.message;
         hitBtn.disabled = true;
         standBtn.disabled = true;
+        showMenuButtons();
     }
 
     if (data.payout !== undefined && data.payout !== 0) {
@@ -105,7 +108,7 @@ standBtn.addEventListener("click", async () => {
     message.textContent = data.message;
     hitBtn.disabled = true;
     standBtn.disabled = true;
-
+    showMenuButtons();
     if (data.payout !== undefined && data.payout !== 0) {
         const res = await fetch(`/api/processgame/blackjack`, {
             method: "POST",
@@ -120,3 +123,14 @@ standBtn.addEventListener("click", async () => {
 homeBtn.addEventListener("click", () => {
     window.location.href = "home.html";
 });
+
+function hideMenuButtons() {
+  startBtn.style.display = "none";
+  homeBtn.style.display = "none";
+}
+
+
+function showMenuButtons() {
+  startBtn.style.display = "inline-block"; // or "block" depending on layout
+  homeBtn.style.display = "inline-block";
+}
