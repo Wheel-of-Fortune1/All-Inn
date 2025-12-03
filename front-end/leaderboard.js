@@ -1,4 +1,6 @@
-﻿document.addEventListener('DOMContentLoaded', function () {
+﻿// Listen for when the document has finished loading and set up the leaderboard.
+
+document.addEventListener('DOMContentLoaded', function () {
     const tabButtons = document.querySelectorAll('.tab-btn');
     const sortContainer = document.querySelector('.sort-container');
     const leaderboardList = document.getElementById('leaderboardList');
@@ -8,7 +10,7 @@
     let currentSort = 'chips';
     let currentUsername = null;
 
-    // Get current logged-in user
+    // Get the current logged in user by using api/auth/me call, store data to check later for the "THIS IS YOU" display on the leaderboard.
     async function getCurrentUser() {
         try {
             const response = await fetch('/api/auth/me', {
@@ -23,12 +25,16 @@
         }
     }
 
+    // Initialize leaderboard, load it, create the buttons based on the keys and values below, and get the current user.
+
     (async function () {
         await getCurrentUser();
         updateSortButtons();
         loadLeaderboard();
     })();
 
+
+    // Fill in all buttons with the available options, for games its the chips won, wins and losses, for players its just their chips.
 
     const sortOptions = {
         players: [
@@ -51,7 +57,8 @@
         ]
     };
 
-    // Tab switching
+    // Create buttons for each category i.e, blackjack, roulette, slots, players, clicking a button switches the tab to that category.
+
     tabButtons.forEach(btn => {
         btn.addEventListener('click', function () {
             tabButtons.forEach(b => b.classList.remove('active'));
@@ -65,6 +72,7 @@
         });
     });
 
+    // Fill in the sort buttons based on the sortOptions for each category whenever a category is switched to.
     function updateSortButtons() {
         const options = sortOptions[currentCategory];
 
@@ -106,6 +114,9 @@
 
     loadLeaderboard();
 
+    // Use the getTop method call to grab the top 100 players for each category and datatpye.
+    // Then call the display leaderboard method with the returned list.
+
     async function loadLeaderboard() {
         leaderboardList.innerHTML = '<div class="loading">Loading leaderboard...</div>';
 
@@ -136,6 +147,7 @@
         }
     }
 
+    // Create a player label for each player in the leaderboard. The 'point' score for each player is saved into the value passed when displayLeaderboard is called, meaning that each persons score for that category and sort can be accessed with player.score
     function displayLeaderboard(players) {
         leaderboardList.innerHTML = '';
 

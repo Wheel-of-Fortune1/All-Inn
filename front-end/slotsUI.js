@@ -75,6 +75,8 @@ spinBtn.addEventListener("click", async () => {
 
     console.log(result)
 
+    // If there is a netResult, and not 0, i.e, ensure that currency was won or lost and that the game is over, we signal to the server to update this players wins, losses, and currency.
+
     if (result.netResult != 0) {
         const res = await fetch(`/api/processgame/slots`, {
             method: "POST",
