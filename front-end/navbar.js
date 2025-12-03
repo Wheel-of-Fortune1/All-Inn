@@ -1,4 +1,4 @@
-﻿// navbar.js - Include this in all pages
+﻿// Used in most pages where the user is logged in, displays their chips, the profile and logout button, and the home button.
 class CasinoNavbar {
     constructor() {
         this.username = null;
@@ -18,7 +18,9 @@ class CasinoNavbar {
 
     async loadUserData() {
         try {
-            // Get current user from session (not localStorage)
+
+            // Get current user from session 
+
             const response = await fetch('/api/auth/me', {
                 credentials: 'include'
             });
@@ -28,6 +30,7 @@ class CasinoNavbar {
                 this.username = user.username;
 
                 // Fetch user's chip balance from backend
+
                 const playerResponse = await fetch(`/api/database/data/players/${this.username}`);
                 const data = await playerResponse.json();
                 this.chips = data.chips || 0;
@@ -37,13 +40,18 @@ class CasinoNavbar {
         }
     }
 
+    // Display the navigation bar
+
     render() {
+
         // Check if navbar already exists
+
         if (document.querySelector('.casino-navbar')) {
             return;
         }
 
         // Create navbar HTML
+
         const navbar = document.createElement('nav');
         navbar.className = 'casino-navbar';
         navbar.innerHTML = `
@@ -71,13 +79,15 @@ class CasinoNavbar {
         `;
 
         // Insert at the beginning of body
+
         if (document.body.firstChild) {
             document.body.insertBefore(navbar, document.body.firstChild);
         } else {
             document.body.appendChild(navbar);
         }
 
-        // Add logout functionality
+        // Calls the logout method when players click the logout button.
+
         if (this.username) {
             const logoutBtn = document.getElementById('logout-btn');
             if (logoutBtn) {
@@ -85,6 +95,8 @@ class CasinoNavbar {
             }
         }
     }
+
+    // Formats comma number values
 
     formatChips(amount) {
         return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -107,13 +119,15 @@ class CasinoNavbar {
         }
     }
 
+    // Update chips every 5 seconds
+
     startChipUpdater() {
-        // Update chips every 5 seconds
         setInterval(() => this.updateChips(), 5000);
     }
 
+    // User can logout by calling the server side logout method.
+
     logout() {
-        // Clear session by calling backend logout endpoint
         fetch('/api/auth/logout', {
             method: 'POST',
             credentials: 'include'
@@ -124,13 +138,10 @@ class CasinoNavbar {
         });
     }
 
-    // Method for games to call after winning/losing
-    async refreshChips() {
-        await this.updateChips();
-    }
 }
 
 // Initialize navbar when DOM is loaded
+
 document.addEventListener('DOMContentLoaded', () => {
     window.casinoNavbar = new CasinoNavbar();
 });

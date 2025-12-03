@@ -1,5 +1,10 @@
-﻿async function loadProfile() {
+﻿// On profile page initialize, fills in the profile with the data from all games and from general data.
+
+async function loadProfile() {
     try {
+
+        // Get the currently logged in user.
+
         const sessionResponse = await fetch('/api/auth/me', {
             credentials: 'include'
         });
@@ -13,6 +18,7 @@
         const username = user.username;
 
         // Fetch data from all tables
+
         const [playerResponse, blackjackResponse, rouletteResponse, slotsResponse] = await Promise.all([
             fetch(`/api/database/data/players/${username}`),
             fetch(`/api/database/data/blackjack/${username}`),
@@ -24,6 +30,8 @@
         const blackjack = await blackjackResponse.json();
         const roulette = await rouletteResponse.json();
         const slots = await slotsResponse.json();
+
+        // Create the profile container
 
         const container = document.getElementById('profileContainer');
         container.innerHTML = `
@@ -125,6 +133,9 @@ function formatNumber(num) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
+
+// Sum wins and loses to get total games played.
+
 function calculateTotalGames(blackjack, roulette, slots) {
     const blackjackGames = (blackjack.wins || 0) + (blackjack.losses || 0);
     const rouletteGames = (roulette.wins || 0) + (roulette.losses || 0);
@@ -132,9 +143,13 @@ function calculateTotalGames(blackjack, roulette, slots) {
     return blackjackGames + rouletteGames + slotsGames;
 }
 
+// Return total wins by summing wins for each game.
+
 function calculateTotalWins(blackjack, roulette, slots) {
     return (blackjack.wins || 0) + (roulette.wins || 0) + (slots.wins || 0);
 }
+
+// Get total W/L ratio by summing game wins and dividing by game losses.
 
 function calculateWinRate(blackjack, roulette, slots) {
     const wins = calculateTotalWins(blackjack, roulette, slots);
