@@ -47,7 +47,19 @@ spinBtn.addEventListener("click", async () => {
     // Wait for spin animation (~4s)
     await new Promise((resolve) => setTimeout(resolve, 4000));
 
-    // 🧮 Display results
+      // 🧮 Display results
+
+
+
+      if (data.details.netResult != 0) {
+          const res = await fetch(`/api/processgame/roulette`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ change: data.details.netResult })
+          });
+      }
+
     const { winningNumber, color, message } = data;
 
     resultDisplay.innerHTML = `

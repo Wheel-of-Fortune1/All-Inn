@@ -2,12 +2,13 @@
 import { getRandomInt } from "../utils/random.js";
 
 class BlackjackGame {
-  constructor() {
-    this.deck = [];
-    this.playerHand = [];
-    this.dealerHand = [];
-    this.gameActive = false;
-  }
+    constructor() {
+        this.deck = [];
+        this.playerHand = [];
+        this.dealerHand = [];
+        this.gameActive = false;
+        this.currentBet = 0; // Add this line
+    }
 
   // Create and shuffle the deck 
   createDeck() {
@@ -65,109 +66,112 @@ class BlackjackGame {
   }
 
   // Initialize new game
-  startGame(betAmount) {
-    this.createDeck();
-    this.playerHand = [];
-    this.dealerHand = [];
-    this.gameActive = true;
+    startGame(betAmount) {
+        this.createDeck();
+        this.playerHand = [];
+        this.dealerHand = [];
+        this.gameActive = true;
+        this.currentBet = betAmount; // Store the bet
 
-// Deal initial cards
-    this.playerHand.push(this.drawCard());
-    this.dealerHand.push(this.drawCard());
-    this.playerHand.push(this.drawCard());
-    this.dealerHand.push(this.drawCard());
+        // Deal initial cards
+        this.playerHand.push(this.drawCard());
+        this.dealerHand.push(this.drawCard());
+        this.playerHand.push(this.drawCard());
+        this.dealerHand.push(this.drawCard());
 
-    const playerValue = this.calculateHandValue(this.playerHand);
-    
-    return {
-      playerHand: this.playerHand,
-      dealerHand: [this.dealerHand[0], { hidden: true }], // Hide dealer's second card
-      playerValue,
-      dealerValue: this.calculateHandValue([this.dealerHand[0]]),
-      gameActive: this.gameActive,
-      betAmount
-    };
-  }
+        const playerValue = this.calculateHandValue(this.playerHand);
+
+        return {
+            playerHand: this.playerHand,
+            dealerHand: [this.dealerHand[0], { hidden: true }],
+            playerValue,
+            dealerValue: this.calculateHandValue([this.dealerHand[0]]),
+            gameActive: this.gameActive,
+            betAmount
+        };
+    }
 
   // Player hit
-  hit() {
-    if (!this.gameActive) {
-      return { error: 'Game is not active' };
+    hit() {
+        if (!this.gameActive) {
+            return { error: 'Game is not active' };
+        }
+
+        const newCard = this.drawCard();
+        this.playerHand.push(newCard);
+        const playerValue = this.calculateHandValue(this.playerHand);
+
+        // Check for bust
+        if (playerValue > 21) {
+            this.gameActive = false;
+            return {
+                playerHand: this.playerHand,
+                playerValue,
+                bust: true,
+                gameActive: false,
+                result: 'dealer_win',
+                message: 'Player busts! Dealer wins.',
+                payout: -this.currentBet // Changed from -1
+            };
+        }
+
+        return {
+            playerHand: this.playerHand,
+            playerValue,
+            gameActive: true
+        };
     }
 
-    const newCard = this.drawCard();
-    this.playerHand.push(newCard);
-    const playerValue = this.calculateHandValue(this.playerHand);
-
-    // Check for busssst
-    if (playerValue > 21) {
-      this.gameActive = false;
-      return {
-        playerHand: this.playerHand,
-        playerValue,
-        bust: true,
-        gameActive: false,
-        result: 'dealer_win',
-        message: 'Player busts! Dealer wins.'
-      };
-    }
-
-    return {
-      playerHand: this.playerHand,
-      playerValue,
-      gameActive: true
-    };
-  }
 
   // Player stands: so dealer turn
-  stand() {
-    if (!this.gameActive) {
-      return { error: 'Game is not active' };
+    stand() {
+        if (!this.gameActive) {
+            return { error: 'Game is not active' };
+        }
+
+        this.gameActive = false;
+        let dealerValue = this.calculateHandValue(this.dealerHand);
+
+        // Dealer draws until 17 or higher
+        while (dealerValue < 17) {
+            this.dealerHand.push(this.drawCard());
+            dealerValue = this.calculateHandValue(this.dealerHand);
+        }
+
+        const playerValue = this.calculateHandValue(this.playerHand);
+
+        // Determine winner
+        let result, message, payout = 0;
+
+        if (dealerValue > 21) {
+            result = 'player_win';
+            message = 'Dealer busts! You win!';
+            payout = this.currentBet; // Changed from 1
+        } else if (playerValue > dealerValue) {
+            result = 'player_win';
+            message = 'You win!';
+            payout = this.currentBet; // Changed from 1
+        } else if (dealerValue > playerValue) {
+            result = 'dealer_win';
+            message = 'Dealer wins!';
+            payout = -this.currentBet; // Changed from -1
+        } else {
+            result = 'push';
+            message = 'Push! It\'s a tie.';
+            payout = 0;
+        }
+
+        return {
+            playerHand: this.playerHand,
+            dealerHand: this.dealerHand,
+            playerValue,
+            dealerValue,
+            result,
+            message,
+            payout,
+            gameActive: false
+        };
     }
-
-    this.gameActive = false;
-    let dealerValue = this.calculateHandValue(this.dealerHand);
-
-    // Dealer draws until 17 or higher
-    while (dealerValue < 17) {
-      this.dealerHand.push(this.drawCard());
-      dealerValue = this.calculateHandValue(this.dealerHand);
-    }
-
-    const playerValue = this.calculateHandValue(this.playerHand);
-
-    // Determine vic royale
-    let result, message, payout = 0;
-
-    if (dealerValue > 21) {
-      result = 'player_win';
-      message = 'Dealer busts! You win!';
-      payout = 2; // 1:1 payout (returns bet + winnings)
-    } else if (playerValue > dealerValue) {
-      result = 'player_win';
-      message = 'You win!';
-      payout = 2;
-    } else if (dealerValue > playerValue) {
-      result = 'dealer_win';
-      message = 'Dealer wins!';
-      payout = 0;
-    } else {
-      result = 'push';
-      message = 'Push! It\'s a tie.';
-      payout = 1; // Return bet
-    }
-
-    return {
-      playerHand: this.playerHand,
-      dealerHand: this.dealerHand,
-      playerValue,
-      dealerValue,
-      result,
-      message,
-      payout,
-      gameActive: false
-    };
-  }
 
   // get current game state
   getGameState() {

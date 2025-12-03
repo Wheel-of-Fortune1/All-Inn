@@ -53,14 +53,10 @@ function stopReels(finalIcons) {
 }
 
 
-
-
 homeBtn.addEventListener("click", () => {
     // Go back to homepage (adjust path if needed)
     window.location.href = "home.html"; 
 });
-
-
 
 
 // === MAIN SPIN BUTTON ===
@@ -76,6 +72,17 @@ spinBtn.addEventListener("click", async () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ bet })
     }).then(res => res.json());
+
+    console.log(result)
+
+    if (result.netResult != 0) {
+        const res = await fetch(`/api/processgame/slots`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ change: result.netResult })
+        });
+    }
 
     // After animation finishes, force icons to match backend
     setTimeout(() => {

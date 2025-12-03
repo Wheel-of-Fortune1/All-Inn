@@ -27,11 +27,16 @@ export async function databaseTest() {
 
 // IE, getTop(players, chips), or getTop(roulette, wins)
 
-export async function getTop(leaderboard, by) {
-    const result = await pool.query(
-        `SELECT * FROM ${leaderboard} ORDER BY ${by} DESC LIMIT 100`
-    )
-    return result.rows
+export async function getTop(table, sortBy,) {
+    try {
+        const result = await pool.query(
+            `SELECT *, ${sortBy} as score FROM ${table} ORDER BY ${sortBy} DESC LIMIT 100`
+        );
+        return result.rows;
+    } catch (error) {
+        console.error('Error getting top players:', error);
+        throw error;
+    }
 }
 
 export async function getAll(datatype) {

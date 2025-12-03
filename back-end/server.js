@@ -24,7 +24,17 @@ import SlotsGame from "../gameplay/slots.js";
 // Creates the backend server and sets up the routes for the games.
 const app = express();
 import helmet from "helmet"
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrcAttr: ["'unsafe-hashes'", "'unsafe-inline'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            imgSrc: ["'self'", "data:", "https:"],
+        }
+    }
+}));
 
 
 app.use(express.json());
@@ -66,12 +76,22 @@ const slots = new SlotsGame();
 // Black Jack Game Implementation
 
 // Starts a new game, player can hit or stand after this.
-app.post("/api/blackjack/start", (req, res) => {
-  console.log("Frontend requested: Start Game");
-  console.log("✅ /api/blackjack/start route was called!");
-  const { bet } = req.body;
-  const result = blackjack.startGame(bet);
-  res.json(result);
+app.post("/api/blackjack/start", async (req, res) => {
+    const { bet } = req.body;
+    if (!req.session.user) {
+        return res.status(401).json({ error: "Must be logged in to play." });
+    }
+
+    const username = req.session.user.username;
+    const player = await Get("players", username);
+
+
+    if (player.chips < bet) {
+        return res.status(400).json({ error: `Insufficient chips. You have $${player.chips}.` });
+    }
+
+    const result = blackjack.startGame(bet);
+    res.json(result);
 });
 
 // Player hits to get another card.
@@ -95,19 +115,33 @@ app.get("/api/blackjack/state", (req, res) => {
 // Roulette Game Implementation
 
 // Reads bets and spins once done.
-app.post("/api/roulette/play", (req, res) => {
-  console.log("Frontend requested: Start Game");
-  const { bets } = req.body;
-  const result = roulette.placeBet(bets);
-  console.log("Got result:", result);
-  res.json({
-    winningNumber: result.spinResult.number,
-    color: result.spinResult.color,
-    message: result.message,
-    details: result, // optional full detail
-  });
-});
+app.post("/api/roulette/play", async (req, res) => {
+    console.log("Frontend requested: Start Game");
+    const { bets } = req.body;
 
+    if (!req.session.user) {
+        return res.status(401).json({ error: "Must be logged in to play." });
+    }
+
+    const username = req.session.user.username;
+    const player = await Get("players", username);
+
+    const totalBet = bets.reduce((sum, bet) => sum + bet.amount, 0);
+
+    if (player.chips < totalBet) {
+        return res.status(400).json({ error: `Insufficient chips. You have $${player.chips}.` });
+    }
+
+    const result = roulette.placeBet(bets);
+    console.log("Got result:", result);
+
+    res.json({
+        winningNumber: result.spinResult.number,
+        color: result.spinResult.color,
+        message: result.message,
+        details: result,
+    });
+});
 // Gives list of valid bet types.
 app.get("/api/roulette/bet-types", (req, res) => {
   console.log("Frontend requested: Get Bet Types");
@@ -117,15 +151,27 @@ app.get("/api/roulette/bet-types", (req, res) => {
 // Slots Game Implementation
 
 //Reads bet amount and spins once done.
-app.post("/api/slots/play", (req, res) => {
-  const { bet } = req.body;
-  console.log("Frontend requested: Start Game");
-  if (!bet || bet <= 0) {
-    return res.status(400).json({ error: "Invalid bet amount" });
-  }
+app.post("/api/slots/play", async (req, res) => {
+    const { bet } = req.body;
+    console.log("Frontend requested: Start Game");
 
-  const result = slots.play(bet);
-  res.json(result);
+    if (!bet || bet <= 0) {
+        return res.status(400).json({ error: "Invalid bet amount" });
+    }
+
+    if (!req.session.user) {
+        return res.status(401).json({ error: "Must be logged in to play." });
+    }
+
+    const username = req.session.user.username;
+    const player = await Get("players", username);
+
+    if (player.chips < bet) {
+        return res.status(400).json({ error: `Insufficient chips. You have $${player.chips}.` });
+    }
+
+    const result = slots.play(bet);
+    res.json(result);
 });
 
 // Gives paytable info
@@ -199,6 +245,15 @@ app.post("/api/auth/:mode", async (req, res) => {
   return res.status(400).json({ error: "Invalid auth request." });
 });
 
+app.post("/api/auth/logout", (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).json({ error: "Failed to logout" });
+        }
+        res.clearCookie('connect.sid');
+        res.json({ message: "Logged out successfully" });
+    });
+});
 
 // Get current logged in user info
 app.get("/api/auth/me", (req, res) => {
@@ -252,7 +307,47 @@ app.post("/api/admin/unban", async (req, res) => {
   res.json({ message: `User ${username} was unbanned.` });
 });
 
+app.post("/api/processgame/:game", async (req, res) => {
+    try {
+        const { game } = req.params
+        const { change } = req.body
 
+        let username = req.session.user.username
+
+        console.log(change)
+
+        if (change > 0) {
+            let b = { chips: change }
+            let b2 = { wins: 1, chipswon: change }
+
+            await Increment("players", username, b)
+            await Increment(game, username, b2)
+        } else if (change < 0) {
+            let b = { chips: change }
+            let b2 = { losses: 1 }
+
+            await Increment("players", username, b)
+            await Increment(game, username, b2)
+        }
+
+
+        const player = await Get("players", username);
+        if (player.chips <= 0) {
+            await Update("players", username, { chips: 5 });
+            return res.json({
+                success: true,
+                pityChips: true,
+                message: "You've gone bankrupt! Here's 5 chips so that you can try again.."
+            });
+        }
+
+        return res.json({ success: true });
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: "Failed to process game." })
+    }
+});
 
 // Database API
 
@@ -271,10 +366,9 @@ app.get("/api/database/data/:table/:username", async (req, res) => {
     }
 });
 
-app.get("/api/database/leaderboard/:leaderName", async (req, res) => {
+app.get("/api/database/lb/:leaderboard/:by", async (req, res) => {
     try {
-        const { leaderboard } = req.params
-        const { by } = req.body
+        const { leaderboard, by } = req.params
         const top = await getTop(leaderboard, by)
         res.status(201).json(top)
     } catch (error) {

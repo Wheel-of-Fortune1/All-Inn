@@ -138,7 +138,8 @@ class SlotsGame {
       message = `🎊 Two ${matchResult.symbol}s! You won ${payout} chips!`;
     } else {
       message = `😔 No match. You lost ${betAmount} chips.`;
-    }
+      }
+
 
     return {
       reels: reels.map(reel => ({
