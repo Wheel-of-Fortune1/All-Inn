@@ -1,3 +1,4 @@
+// Wait for DOM to load
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     // Get logged-in user info

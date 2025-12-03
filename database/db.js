@@ -39,6 +39,7 @@ export async function getTop(table, sortBy,) {
     }
 }
 
+// Database retrieval functions.
 export async function getAll(datatype) {
     const result = await pool.query(
         `SELECT * FROM ${datatype}`
@@ -46,6 +47,7 @@ export async function getAll(datatype) {
     return result.rows
 }
 
+// Getter for a single player's data.
 export async function Get(dataType, username) {
     const result = await pool.query(
         `SELECT * FROM ${dataType} WHERE username = $1`, [username]
@@ -65,6 +67,7 @@ export async function addPlayer(username, password, chips = 1000) {
     return result.rows[0]
 }
 
+// Remove a player from the database.
 export async function removePlayer(username) {
     const result = await pool.query(
         "DELETE FROM players WHERE username = $1", [username]
@@ -72,6 +75,7 @@ export async function removePlayer(username) {
     return 0
 }
 
+// Increment fields in a player's data.
 export async function Increment(dataType, username, fields) {
     const entries = Object.entries(fields);
 
@@ -95,6 +99,7 @@ export async function Increment(dataType, username, fields) {
     return result.rows[0];
 }
 
+// Update fields in a player's data.
 export async function Update(dataType, username, fields) {
     const entries = Object.entries(fields);
 

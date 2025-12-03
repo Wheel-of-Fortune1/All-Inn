@@ -36,17 +36,18 @@ app.use(helmet({
     }
 }));
 
-
+// Middleware
 app.use(express.json());
 app.use(bodyParser.json());
 
+// Session management
 import session from "express-session";
-
 app.use(cors({
   origin: "http://localhost:3000", 
   credentials: true
 }));
 
+// Session setup
 app.use(session({
   secret: "super-secret-key-change-this",
   resave: false,
@@ -60,7 +61,7 @@ app.use(session({
   }
 }));
 
-
+// Serve static front-end files
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const frontendPath = path.join(__dirname, "../front-end");
@@ -142,6 +143,7 @@ app.post("/api/roulette/play", async (req, res) => {
         details: result,
     });
 });
+
 // Gives list of valid bet types.
 app.get("/api/roulette/bet-types", (req, res) => {
   console.log("Frontend requested: Get Bet Types");
@@ -245,6 +247,7 @@ app.post("/api/auth/:mode", async (req, res) => {
   return res.status(400).json({ error: "Invalid auth request." });
 });
 
+// Logout endpoint
 app.post("/api/auth/logout", (req, res) => {
     req.session.destroy((err) => {
         if (err) {
@@ -307,6 +310,7 @@ app.post("/api/admin/unban", async (req, res) => {
   res.json({ message: `User ${username} was unbanned.` });
 });
 
+// Process game results and update player stats
 app.post("/api/processgame/:game", async (req, res) => {
     try {
         const { game } = req.params
@@ -366,6 +370,7 @@ app.get("/api/database/data/:table/:username", async (req, res) => {
     }
 });
 
+// Get all players from a table and return as array of the whole leaderboard
 app.get("/api/database/lb/:leaderboard/:by", async (req, res) => {
     try {
         const { leaderboard, by } = req.params
@@ -377,6 +382,7 @@ app.get("/api/database/lb/:leaderboard/:by", async (req, res) => {
     }
 });
 
+// Increment fields in a player's data
 app.patch("/api/database/data/:table/:username/add", async (req, res) => {
     try {
         const { table, username } = req.params
@@ -394,6 +400,7 @@ app.patch("/api/database/data/:table/:username/add", async (req, res) => {
     }
 });
 
+// Add a new player to the database
 app.post("/api/database/player", async (req, res) => {
     try {
         const { username, password, chips } = req.body
@@ -406,6 +413,7 @@ app.post("/api/database/player", async (req, res) => {
     }
 });
 
+// Remove a player from the database
 app.delete("/api/database/player/:username", async (req, res) => {
     try {
         const { username } = req.params
@@ -418,6 +426,7 @@ app.delete("/api/database/player/:username", async (req, res) => {
     }
 });
 
+// Update fields in a player's data
 app.patch("/api/database/data/:table/:username", async (req, res) => {
     try {
         const { table, username } = req.params
