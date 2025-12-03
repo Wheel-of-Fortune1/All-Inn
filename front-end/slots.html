@@ -1,5 +1,4 @@
-
-<!-- HTML File for the slots, create roll and bet buttons and load display for the machine -->
+<!-- HTML file for the slots page, creates buttons, visuual for the machine. -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -213,10 +212,12 @@
         }
 
         .info {
-            padding: 8px 24px 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            display: flex;
+            justify-content: center;
+        }
+        .last-result {
+            text-align: center;
+            width: 100%;
         }
 
         .stat {
@@ -280,14 +281,6 @@
                 transform: translateY(1px) scale(.98);
             }
 
-        .current-bet-display {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-weight: 700;
-            color: white;
-            font-size: 16px;
-        }
     </style>
 </head>
 <body>
@@ -306,12 +299,10 @@
                 <button class="quick-bet" onclick="document.getElementById('bet').value=10">$10</button>
                 <button class="quick-bet" onclick="document.getElementById('bet').value=50">$50</button>
                 <button class="quick-bet" onclick="document.getElementById('bet').value=100">$100</button>
-                <div class="current-bet-display">
-                    Bet: $<span id="current-bet">10</span>
-                </div>
+
             </div>
             <div class="control-group">
-                <button id="spinBtn" class="btn">SPIN (Space)</button>
+                <button id="spinBtn" class="btn">SPIN</button>
             </div>
         </section>
 
@@ -324,18 +315,13 @@
         </section>
 
         <section class="info">
-            <div class="stat">
-                <h4>Balance</h4>
-                <p id="balance">$100</p>
-            </div>
-            <div class="stat">
+            <div class="stat last-result">
                 <h4>Last result</h4>
                 <p id="lastResult">Welcome! Press SPIN to play.</p>
             </div>
         </section>
 
         <div class="footer">
-            Keyboard: <span class="kbd">Space</span> to spin • <span class="kbd">R</span> to reset
         </div>
         <button id="home-btn">Home</button>
     </main>
